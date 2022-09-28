@@ -94,13 +94,21 @@ Question: In the R chunk below, write "dataframe1\$". Press `tab` after you type
 Find a ten-day forecast of temperatures (Fahrenheit) for Durham, North Carolina. Create two vectors, one representing the high temperature on each of the ten days and one representing the low.
 
 ```{r DataExercise-1a}
-
+vectorHigh <- c(89,92,73,78,86,82,79,74,71,67) 
+vectorHigh
+vectorlow <- c(65,56,48,58,63,55,51,52,52,54)
+vectorlow
 ```
 
 Now, create two additional vectors that include the ten-day forecast for the high and low temperatures in Celsius. Use a function to create the two new vectors from your existing ones in Fahrenheit.
 
 ```{r DataExercise-1b}
-
+vectorHigh <- c(89,92,73,78,86,82,79,74,71,67) 
+vectorHigh
+vectorlow <- c(65,56,48,58,63,55,51,52,52,54)
+vectorlow
+function
+lapply(vectorHigh, mean())
 ```
 
 Combine your four vectors into a data frame and add informative column names.

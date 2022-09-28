@@ -1,30 +1,95 @@
 ---
-title: "assignment01"
+title: '<Jiawei Liang>Assignment 2: Coding Basics'
 author: "Jiawei Liang"
-date: "2022-09-14"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  word_document: default
+geometry: margin=2.54cm
+editor_options:
+  chunk_output_type: console
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+
+## Directions
+
+1.  Rename this file `<FirstLast>_A02_CodingBasics.Rmd` (replacing `<FirstLast>` with your first and last name).
+2.  Change "Student Name" on line 3 (above) with your name.
+3.  Work through the steps, **creating code and output** that fulfill each instruction.
+4.  Be sure to **answer the questions** in this assignment document.
+5.  When you have completed the assignment, **Knit** the text and code into a single PDF file.
+6.  After Knitting, submit the completed exercise (PDF file) to Sakai.
+
+## Basics Day 1
+
+1.  Generate a sequence of numbers from one to 100, increasing by fours. Assign this sequence a name.
+
+2.  Compute the mean and median of this sequence.
+
+3.  Ask R to determine whether the mean is greater than the median.
+
+4.  Insert comments in your code to describe what you are doing.
+
+
+```{r}
+#1.Generate a sequence from 1 to 100,which increases by 4.
+seq(1,100, by=4) 
+#2.Name this sequence 'squence_1_to_100'.
+squence_1_to_100<-seq(1,100,by=4) 
+#3. compute the mean and median of this sequence.
+mean(squence_1_to_100)  
+median(squence_1_to_100) 
+#4.Ask R whether mean is greater than median
+mean(squence_1_to_100)>median(squence_1_to_100)
 ```
 
-## R Markdown
+## Basics Day 2
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+5.  Create a series of vectors, each with four components, consisting of (a) names of students, (b) test scores out of a total 100 points, and (c) whether or not they have passed the test (TRUE or FALSE) with a passing grade of 50.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+6.  Label each vector with a comment on what type of vector it is.
 
-```{r cars}
-summary(cars)
+7.  Combine each of the vectors into a data frame. Assign the data frame an informative name.
+
+8.  Label the columns of your data frame with informative titles.
+
+```{r}
+#1.Vector of names
+aaa <- c("Albert","Bill","Carl","David")
+#2.Vector of grades
+bb <- c(95, 72, 48, 85)
+#3.Vector of whether or not they have passed the test
+ccc <- c('TRUE','TRUE','FALSE','TRUE')
+#4.Combine vectors into a data frame and call it Student_transcript
+Studentstranscript <- data.frame(aaa,bb,ccc) 
+#5.label the columns of my data 'Name' 'Scores' 'Pass'
+names(Studentstranscript) <- c("Name","Scores","Pass");
+
 ```
 
-## Including Plots
+9.QUESTION: How is this data frame different from a matrix?
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+> Answer
+ Things that they contain are different. 
+A data frame can contain  characters, numbers, factors and times all at once. It could contains different things.
+ A matrix can only contain a single type.
+
+10.Create a function with an if/else statement. Your function should take a **vector** of test scores and print (not return) whether a given test score is a passing grade of 50 or above (TRUE or FALSE). You will need to choose either the `if` and `else` statements or the `ifelse` statement. 
+
+11.Apply your function to the vector with test scores that you created in number 5.
+```{r}
+ifelse(bb >= 50,'TRUE','FALSE')
 ```
+12. QUESTION: Which option of `if` and `else` vs. `ifelse` worked? Why?
+> Answer
+'ifelse'works.
+  For 'if' and 'else',it checks whether a logical condition (i.e. b>=50) is TRUE.
+If the logical condition is not TRUE, apply the content within the else statement (i.e. return the sentence “If condition was FALSE”).
+  For 'ifelse',it checks the logical condition we want to test.
+What should happen in case the logical condition is TRUE.
+What should happen in case the logical condition is FALSE.
+In this question, we need to check the result after the logical is true or false. So ifelse is better.
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
