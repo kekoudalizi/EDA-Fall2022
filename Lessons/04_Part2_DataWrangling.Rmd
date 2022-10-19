@@ -1,10 +1,13 @@
 ---
 title: "4: Part 2 - Data Wrangling"
-author: "Environmental Data Analytics | John Fay and Luana Lima | Developed by Kateri Salk"
+author: Environmental Data Analytics | John Fay and Luana Lima | Developed by Kateri
+  Salk
 date: "Fall 2022"
-output: pdf_document
+output:
+  word_document: default
+  pdf_document: default
 geometry: margin=2.54cm
-editor_options: 
+editor_options:
   chunk_output_type: console
 ---
 
