@@ -1,11 +1,13 @@
 ---
-title: "Assignment 8: Spatial Analysis in R"
-author: "Student Name"
-output: pdf_document
+title: 'Assignment 8: Spatial Analysis in R'
+author: "Jiawei Liang"
+output:
+  html_document:
+    df_print: paged
 geometry: margin=2.54cm
-editor_options: 
+editor_options:
   chunk_output_type: console
-  markdown: 
+  markdown:
     wrap: 72
 ---
 
@@ -31,10 +33,14 @@ This exercise accompanies the lessons in Environmental Data Analytics (ENV872L) 
 
 ```{r Prepare workspace}
 #1.
-
+getwd()
+setwd('c:/Users/Jiawei Liang/Documents/EDA-Fall2022/Data/Raw/')
 
 #2. 
-
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(mapview)
 
 ```
 
@@ -48,19 +54,19 @@ In this exercise, we will be exploring stream gage height data in Nebraska corre
 
 ```{r Read the county data into an sf dataframe}
 #3. Read in Counties shapefile into an sf dataframe, filtering for just NE counties
-
-
+Nebraskacountry_sf <- st_read ('c:/Users/Jiawei Liang/Documents/EDA-Fall2022/Data/Spatial/cb_2018_us_county_20m.shp')%>% 
+  filter(STATEFP == 31)
 #4. Reveal the CRS of the counties features
-
-
+st_crs(Nebraskacountry_sf)
 #5. Plot the data
-
+ggplot(data=Nebraskacountry_sf) +
+  geom_sf()
 ```
 
 6. What is the EPSG code of the Counties dataset? Is this a geographic or a projected coordinate reference system? (Or, does this CRS use angular or planar coordinate units?) To what datum is this CRS associated? (Tip: look the EPSG code on <https://spatialreference.org>) 
 
 > ANSWER: 
-> 
+> EPSG Geodetic Parameter Dataset is a geographic reference system and also is a public registry of geodetic datums, spatial reference systems, Earth ellipsoids, coordinate transformations and related units of measurement. 
 
 
 ### Read in gage locations csv as a dataframe, then display the column names it contains
@@ -73,15 +79,16 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 
 ```{r Read in USGS Gage Locations}
 #7. Read in gage locations csv as a dataframe
-
+setwd('c:/Users/Jiawei Liang/Documents/EDA-Fall2022/Data/Raw/')
+NWIS_SiteInformation <- read.csv('NWIS_SiteInfo_NE_RAW.csv',stringsAsFactors =TRUE)
 
 #8. Reveal the names of the columns
-
+colnames(NWIS_SiteInformation)
 
 ```
 
 9. What columns in the dataset contain the x and y coordinate values, respectively?  
-> ANSWER:
+> ANSWER: In the dataset, the dec_lat_ca contains y value and the dec_long_va contains x value. 
 > 
 
 
@@ -94,16 +101,18 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 
 ```{r Convert dataframe to sf dataframe}
 #10. Convert to an sf object
-
+NWIS_SiteInformation.sf <- NWIS_SiteInformation %>% 
+  st_as_sf(coords = c('dec_long_va','dec_lat_va'),
+           crs=4326)
 
 #11. Re-examine the column names
-
+colnames(NWIS_SiteInformation.sf)
 
 ```
 
 12. What new field(s) appear in the sf dataframe created? What field(s), if any, disappeared?
 
->ANSWER: 
+>ANSWER: A column called geometry is created. dec_long_va and dec_lat_va columns disappear.
 >
 
 
@@ -116,7 +125,12 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 
 ```{r Plot the spatial features}
 #13. Plot the gage locations atop the county features
-
+NWIS_Gage_Locations_in_Nebraska <-
+ggplot() +
+  geom_sf(data = Nebraskacountry_sf,color='black') + 
+  geom_sf(data = NWIS_SiteInformation.sf,color='red',shape='O') +
+  ggtitle("NWIS Gage Locations in Nebraska", subtitle = "Jiawei Liang")
+  print(NWIS_Gage_Locations_in_Nebraska)
 
 ```
 
@@ -135,19 +149,20 @@ Lastly, we want to attach some gage height data to our site locations. I've cons
 
 ```{r}
 #14. Read the site flow data into a data frame
-
+setwd('c:/Users/Jiawei Liang/Documents/EDA-Fall2022/Data/Raw/')
+NWIS_SiteFlowInformation <- read.csv('NWIS_SiteFlowData_NE_RAW.csv',stringsAsFactors =TRUE)
 
 #15. Show the column names
-
+colnames(NWIS_SiteFlowInformation)
 
 #16. Join the flow data to our NWIS gage location spatial dataframe
-
+Joindata_gage <- merge(NWIS_SiteInformation,NWIS_SiteFlowInformation,by="site_no",all.x = TRUE)
 
 #17. Show the column names of the joined dataset
-
+colnames(Joindata_gage)
 
 #18. Show the dimensions of this joined dataset
-
+dim(Joindata_gage)
 
 ```
 
@@ -158,7 +173,12 @@ Now we can examine where the flooding appears most acute by visualizing gage hei
  * Show the magnitude of gage height by color, shape, other visualization technique.
 
 ```{r}
-#Map the points, sized by gage height
+Joindata.sf <- Joindata_gage %>% 
+  st_as_sf(coords = c('dec_long_va','dec_lat_va'),
+           crs=4326)
+mapview(Nebraskacountry_sf) +
+  mapview(Joindata.sf, zcol = "gage_ht",
+  col.regions = mapviewGetOption("vector.palette"), at = c(0, 5, 10, 15,20, 25))
 
 
 ```
@@ -177,10 +197,21 @@ Up next we will do some spatial analysis with our data. To prepare for this, we 
 
 ```{r}
 #20 Transform the counties and gage location datasets to UTM Zone 14
-
+NWIS_SiteInformation_utm <-      st_transform(NWIS_SiteInformation.sf, crs = 26917)
+Joindata_utm <-      st_transform(Joindata.sf, crs = 26917)
 
 #21 Plot the data
-
+mapview(Nebraskacountry_sf) +
+  mapview(Joindata_utm, zcol = "gage_ht",
+  col.regions = mapviewGetOption("vector.palette"), at = c(0, 5, 10, 15,20, 25))
+  
+figure2 <-
+ggplot() +
+  geom_sf(data = NWIS_SiteInformation_utm,color='blue') + 
+  geom_sf(data = NWIS_SiteInformation_utm,color='red',shape='O') +
+  ggtitle("UTM Zone 14N", subtitle = "Jiawei Liang")
+  print(NWIS_Gage_Locations_in_Nebraska)
+  
 
 ```
 
@@ -198,13 +229,29 @@ Now let's zoom into a particular county and examine the gages located there.
 
 ```{r}
 #22 Select the county
-
+Lancaster <- filter(Nebraskacountry_sf, NAME == "Lancaster")
 
 #23 Select gages within the selected county
-
-
+#Langage <- st_intersection(Nebraskacountry_sf,NWIS_SiteInformation_utm)
+#Sorry I do not know how to do this.
 #24 Plot
+Nebraska1 <- filter(NWIS_SiteInformation_utm, station_nm == "Missouri River at Nebraska City, NE")
 
+Nebraska2 <- filter(NWIS_SiteInformation_utm, station_nm == "North Fork Republican River at Colorado-Nebraska")
+#ggplot
+figure3 <-
+ggplot() +
+  geom_sf(data = Nebraskacountry_sf,color='black') + 
+  geom_sf(data = Lancaster,color='yellow') + 
+  geom_sf(data = Nebraska1,color='red') + 
+  geom_sf(data = Nebraska2,color='red') + 
+  ggtitle("Jiawei Liang")
+  print(figure3)
+#mapview 
+  mapview(Nebraskacountry_sf) +
+  mapview(Lancaster,color='yellow') +
+  mapview(Nebraska1,color='red') +
+  mapview(Nebraska2,color='red')
 
 
 ```
